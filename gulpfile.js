@@ -4,6 +4,7 @@ var source     = require('vinyl-source-stream');
 var reactify   = require('reactify');
 var buffer     = require('vinyl-buffer');
 var uglify     = require('gulp-uglify');
+var babel      = require('gulp-babel');
 
 /**
  * Examples Build
@@ -62,4 +63,10 @@ gulp.task('watch-dev', function() {
   ], {}, function() {
     return gulp.start('build-dev');
   });
+});
+
+gulp.task('dist', function() {
+  return gulp.src('src/**/*.js')
+    .pipe(babel())
+    .pipe(gulp.dest('dist'));
 });
