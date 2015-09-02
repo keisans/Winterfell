@@ -1,5 +1,6 @@
-var React = require('react');
-var _     = require('lodash');
+var React    = require('react');
+var _        = require('lodash');
+var KeyCodez = require('keycodez');
 
 var Validation    = require('./lib/validation');
 var ErrorMessages = require('./lib/errors');
@@ -15,6 +16,38 @@ class QuestionPanel extends React.Component {
     this.state = {
       validationErrors : this.props.validationErrors
     };
+  }
+
+  handleAnswerValidate(questionId, questionAnswer, validations) {
+    if (typeof validations === 'undefined'
+         || validations.length === 0) {
+      return;
+    }
+
+    /*
+     * Run the question through its validations and
+     * show any error messages if invalid.
+     */
+    var questionValidationErrors = [];
+    validations
+      .forEach(validation => {
+        if (Validation.validateAnswer(questionAnswer, validation)) {
+          return;
+        }
+
+        questionValidationErrors.push({
+          type    : validation.type,
+          message : ErrorMessages.getErrorMessage(validation)
+        });
+      });
+
+    var validationErrors = _.chain(this.state.validationErrors)
+                            .set(questionId, questionValidationErrors)
+                            .value();
+
+    this.setState({
+      validationErrors : validationErrors
+    });
   }
 
   handleMainButtonClick() {
@@ -97,38 +130,31 @@ class QuestionPanel extends React.Component {
     this.props.onPanelBack();
   }
 
-  handleAnswerChange(questionId, questionAnswer, validations) {
+  handleAnswerChange(questionId, questionAnswer, validations, validateOn) {
     this.props.onAnswerChange(questionId, questionAnswer);
 
-    if (typeof validations === 'undefined'
-         || validations.length === 0) {
-      return;
-    }
-
-    /*
-     * Run the question through its validations and
-     * show any error messages if invalid.
-     */
-    var questionValidationErrors = [];
-    validations
-      .forEach(validation => {
-        if (Validation.validateAnswer(questionAnswer, validation)) {
-          return;
-        }
-
-        questionValidationErrors.push({
-          type    : validation.type,
-          message : ErrorMessages.getErrorMessage(validation)
-        });
-      });
-
-    var validationErrors = _.chain(this.state.validationErrors)
-                            .set(questionId, questionValidationErrors)
-                            .value();
-
     this.setState({
-      validationErrors : validationErrors
+      validationErrors : _.chain(this.state.validationErrors)
+                          .set(questionId, [])
+                          .value()
     });
+
+    if (validateOn === 'change') {
+      this.handleAnswerValidate(questionId, questionAnswer, validations);
+    }
+  }
+
+  handleQuestionBlur(questionId, questionAnswer, validations, validateOn) {
+    if (validateOn === 'blur') {
+      this.handleAnswerValidate(questionId, questionAnswer, validations);
+    }
+  }
+
+  handleInputKeyDown(e) {
+    if (KeyCodez[e.keyCode] === 'enter') {
+      e.preventDefault();
+      this.handleMainButtonClick.call(this);
+    }
   }
 
   render() {
@@ -150,7 +176,9 @@ class QuestionPanel extends React.Component {
                      questionAnswers={this.props.questionAnswers}
                      renderError={this.props.renderError}
                      validationErrors={this.state.validationErrors}
-                     onAnswerChange={this.handleAnswerChange.bind(this)} />
+                     onAnswerChange={this.handleAnswerChange.bind(this)}
+                     onQuestionBlur={this.handleQuestionBlur.bind(this)}
+                     onKeyDown={this.handleInputKeyDown.bind(this)} />
       );
     });
 
