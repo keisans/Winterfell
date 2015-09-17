@@ -36,7 +36,8 @@ var FileInput = (function (_React$Component) {
       return React.createElement("input", { type: "file",
         name: this.props.name,
         className: this.props.classes.file,
-        onChange: this.handleChange.bind(this) });
+        onChange: this.handleChange.bind(this),
+        onBlur: this.props.onBlur.bind(null, this.state.value) });
     }
   }]);
 
@@ -49,7 +50,8 @@ FileInput.defaultProps = {
   classes: {},
   name: undefined,
   value: undefined,
-  onChange: function onChange() {}
+  onChange: function onChange() {},
+  onBlur: function onBlur() {}
 };
 
 module.exports = FileInput;

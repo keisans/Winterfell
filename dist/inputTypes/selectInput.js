@@ -48,7 +48,8 @@ var SelectInput = (function (_React$Component) {
           className: this.props.classes.select,
           value: this.state.value,
           ref: "select",
-          onChange: this.handleChange.bind(this) },
+          onChange: this.handleChange.bind(this),
+          onBlur: this.props.onBlur.bind(null, this.state.value) },
         options
       );
     }
@@ -77,7 +78,8 @@ SelectInput.defaultProps = {
   name: undefined,
   value: undefined,
   options: [],
-  onChange: function onChange() {}
+  onChange: function onChange() {},
+  onBlur: function onBlur() {}
 };
 
 module.exports = SelectInput;

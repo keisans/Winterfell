@@ -38,7 +38,9 @@ var EmailInput = (function (_React$Component) {
         className: this.props.classes.input,
         placeholder: this.props.placeholder,
         value: this.state.value,
-        onChange: this.handleChange.bind(this) });
+        onChange: this.handleChange.bind(this),
+        onBlur: this.props.onBlur.bind(null, this.state.value),
+        onKeyDown: this.props.onKeyDown });
     }
   }]);
 
@@ -52,7 +54,9 @@ EmailInput.defaultProps = {
   name: undefined,
   value: undefined,
   placeholder: undefined,
-  onChange: function onChange() {}
+  onChange: function onChange() {},
+  onBlur: function onBlur() {},
+  onKeyDown: function onKeyDown() {}
 };
 
 module.exports = EmailInput;

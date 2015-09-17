@@ -1,5 +1,6 @@
-var _         = require('lodash');
-var Validator = require('validator');
+var _            = require('lodash');
+var Validator    = require('validator');
+var StringParser = require('./stringParser');
 
 var extraValidators = {
 
@@ -32,7 +33,7 @@ var extraValidators = {
  * @param  object  validationItem Rule set for validator
  * @return boolean                Valid?
  */
-var validateAnswer = (value, validationItem) => {
+var validateAnswer = (value, validationItem, questionAnswers) => {
   var validationMethod = typeof extraValidators[validationItem.type] !== 'undefined'
                            ? extraValidators[validationItem.type]
                            : Validator.hasOwnProperty(validationItem.type)
@@ -45,9 +46,33 @@ var validateAnswer = (value, validationItem) => {
                     + validationItem.type + '"');
   }
 
+  /*
+   * Clone the validation parameters so it doesn't effect the
+   * parameters elsewhere by reference.
+   */
   var validationParameters = (validationItem.params || []).slice(0);
+
+  /*
+   * Run the parameters through the stringParser with the
+   * questionAnswers so that it sets the questionAnswer
+   * as the parameter.
+   */
+  validationParameters = validationParameters.map(p => {
+    return typeof p === 'string'
+             ? StringParser(p, questionAnswers)
+             : p;
+  });
+
+  /*
+   * Push the value of the question we're validating to
+   * the first parameter of the validationParameters
+   */
   validationParameters.unshift(value);
 
+  /*
+   * Return the result of the validation method running
+   * wtih the validationParameters.
+   */
   return validationMethod.apply(null, validationParameters);
 };
 
@@ -85,7 +110,9 @@ var getActiveQuestions = (questions, questionAnswers, activeQuestions) => {
             return;
           }
 
-          activeQuestions = getActiveQuestions(option.conditionalQuestions, questionAnswers, activeQuestions);
+          activeQuestions = getActiveQuestions(option.conditionalQuestions,
+                                               questionAnswers,
+                                               activeQuestions);
         });
 
     });
@@ -137,7 +164,9 @@ var getQuestionPanelInvalidQuestions = (questionSets, questionAnswers) => {
   questionsToCheck
     .forEach(({questionId, validations}) =>
       [].forEach.bind(validations, validation => {
-        var valid = validateAnswer(questionAnswers[questionId], validation);
+        var valid = validateAnswer(questionAnswers[questionId],
+                                   validation,
+                                   questionAnswers);
         if (valid) {
           return;
         }

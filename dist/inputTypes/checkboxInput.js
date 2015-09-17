@@ -48,7 +48,8 @@ var CheckboxInput = (function (_React$Component) {
             className: this.props.classes.checkbox,
             checked: this.state.checked,
             value: this.props.value,
-            onChange: this.handleChange.bind(this) }),
+            onChange: this.handleChange.bind(this),
+            onBlur: this.props.onBlur.bind(null, this.state.checked ? this.props.value : undefined) }),
           this.props.text
         )
       );
@@ -65,7 +66,8 @@ CheckboxInput.defaultProps = {
   classes: {},
   name: undefined,
   value: undefined,
-  onChange: function onChange() {}
+  onChange: function onChange() {},
+  onBlur: function onBlur() {}
 };
 
 module.exports = CheckboxInput;

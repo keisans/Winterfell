@@ -49,8 +49,9 @@ var RadioOptionsInput = (function (_React$Component) {
               React.createElement("input", { type: "radio",
                 name: _this.props.name,
                 checked: _this.state.value == opt.value,
+                className: _this.props.classes.radio,
                 onChange: _this.handleChange.bind(_this, opt.value),
-                className: _this.props.classes.radio }),
+                onBlur: _this.props.onBlur.bind(null, _this.state.value) }),
               opt.text
             )
           );
@@ -69,7 +70,8 @@ RadioOptionsInput.defaultProps = {
   name: undefined,
   value: undefined,
   options: [],
-  onChange: function onChange() {}
+  onChange: function onChange() {},
+  onBlur: function onBlur() {}
 };
 
 module.exports = RadioOptionsInput;

@@ -32,6 +32,7 @@ var QuestionSet = (function (_React$Component) {
           questionSetId: _this.props.id,
           questionId: question.questionId,
           question: question.question,
+          validateOn: question.validateOn,
           validations: question.validations,
           text: question.text,
           postText: question.postText,
@@ -41,7 +42,9 @@ var QuestionSet = (function (_React$Component) {
           renderError: _this.props.renderError,
           questionAnswers: _this.props.questionAnswers,
           validationErrors: _this.props.validationErrors,
-          onAnswerChange: _this.props.onAnswerChange });
+          onAnswerChange: _this.props.onAnswerChange,
+          onQuestionBlur: _this.props.onQuestionBlur,
+          onKeyDown: _this.props.onKeyDown });
       });
 
       return React.createElement(
@@ -65,7 +68,9 @@ QuestionSet.defaultProps = {
   classes: {},
   validationErrors: {},
   renderError: undefined,
-  onAnswerChange: function onAnswerChange() {}
+  onAnswerChange: function onAnswerChange() {},
+  onQuestionBlur: function onQuestionBlur() {},
+  onKeyDown: function onKeyDown() {}
 };
 
 module.exports = QuestionSet;

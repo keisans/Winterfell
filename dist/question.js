@@ -25,7 +25,12 @@ var Question = (function (_React$Component) {
   _createClass(Question, [{
     key: 'handleInputChange',
     value: function handleInputChange(questionId, value) {
-      this.props.onAnswerChange(questionId, value, this.props.validations);
+      this.props.onAnswerChange(questionId, value, this.props.validations, this.props.validateOn);
+    }
+  }, {
+    key: 'handleInputBlur',
+    value: function handleInputBlur(questionId, value) {
+      this.props.onQuestionBlur(questionId, value, this.props.validations, this.props.validateOn);
     }
   }, {
     key: 'render',
@@ -54,6 +59,7 @@ var Question = (function (_React$Component) {
               question: conditionalQuestion.question,
               text: conditionalQuestion.text,
               postText: conditionalQuestion.postText,
+              validateOn: conditionalQuestion.validateOn,
               validations: conditionalQuestion.validations,
               value: _this.props.questionAnswers[conditionalQuestion.questionId],
               input: conditionalQuestion.input,
@@ -61,7 +67,9 @@ var Question = (function (_React$Component) {
               renderError: _this.props.renderError,
               questionAnswers: _this.props.questionAnswers,
               validationErrors: _this.props.validationErrors,
-              onAnswerChange: _this.props.onAnswerChange.bind(_this) }));
+              onAnswerChange: _this.props.onAnswerChange,
+              onQuestionBlur: _this.props.onQuestionBlur,
+              onKeyDown: _this.props.onKeyDown }));
           })();
         });
       }
@@ -97,7 +105,9 @@ var Question = (function (_React$Component) {
           options: this.props.input.options,
           placeholder: this.props.input.placeholder,
           classes: this.props.classes,
-          onChange: this.handleInputChange.bind(this, this.props.questionId) }),
+          onChange: this.handleInputChange.bind(this, this.props.questionId),
+          onBlur: this.handleInputBlur.bind(this, this.props.questionId),
+          onKeyDown: this.props.onKeyDown }),
         !!this.props.postText ? React.createElement(
           'p',
           { className: this.props.classes.questionPostText },
@@ -126,6 +136,7 @@ Question.defaultProps = {
   questionSetId: undefined,
   questionId: undefined,
   question: '',
+  validateOn: 'blur',
   validations: [],
   text: undefined,
   postText: undefined,
@@ -140,6 +151,8 @@ Question.defaultProps = {
   questionAnswers: {},
   validationErrors: {},
   onAnswerChange: function onAnswerChange() {},
+  onQuestionBlur: function onQuestionBlur() {},
+  onKeyDown: function onKeyDown() {},
   renderError: undefined
 };
 

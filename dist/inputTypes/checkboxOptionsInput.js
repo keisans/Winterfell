@@ -60,8 +60,9 @@ var CheckboxOptionsInput = (function (_React$Component) {
                 name: _this.props.name,
                 value: opt.value,
                 checked: _this.state.value.indexOf(opt.value) > -1,
+                className: _this.props.classes.checkbox,
                 onChange: _this.handleChange.bind(_this),
-                className: _this.props.classes.checkbox }),
+                onBlur: _this.props.onBlur.bind(null, _this.state.value) }),
               opt.text
             )
           );
@@ -80,7 +81,8 @@ CheckboxOptionsInput.defaultProps = {
   name: undefined,
   value: [],
   options: [],
-  onChange: function onChange() {}
+  onChange: function onChange() {},
+  onBlur: function onBlur() {}
 };
 
 module.exports = CheckboxOptionsInput;

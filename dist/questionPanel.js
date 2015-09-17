@@ -10,6 +10,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== 'function' 
 
 var React = require('react');
 var _ = require('lodash');
+var KeyCodez = require('keycodez');
 
 var Validation = require('./lib/validation');
 var ErrorMessages = require('./lib/errors');
@@ -31,6 +32,35 @@ var QuestionPanel = (function (_React$Component) {
   }
 
   _createClass(QuestionPanel, [{
+    key: 'handleAnswerValidate',
+    value: function handleAnswerValidate(questionId, questionAnswer, validations) {
+      if (typeof validations === 'undefined' || validations.length === 0) {
+        return;
+      }
+
+      /*
+       * Run the question through its validations and
+       * show any error messages if invalid.
+       */
+      var questionValidationErrors = [];
+      validations.forEach(function (validation) {
+        if (Validation.validateAnswer(questionAnswer, validation)) {
+          return;
+        }
+
+        questionValidationErrors.push({
+          type: validation.type,
+          message: ErrorMessages.getErrorMessage(validation)
+        });
+      });
+
+      var validationErrors = _.chain(this.state.validationErrors).set(questionId, questionValidationErrors).value();
+
+      this.setState({
+        validationErrors: validationErrors
+      });
+    }
+  }, {
     key: 'handleMainButtonClick',
     value: function handleMainButtonClick() {
       var _this = this;
@@ -113,34 +143,31 @@ var QuestionPanel = (function (_React$Component) {
     }
   }, {
     key: 'handleAnswerChange',
-    value: function handleAnswerChange(questionId, questionAnswer, validations) {
+    value: function handleAnswerChange(questionId, questionAnswer, validations, validateOn) {
       this.props.onAnswerChange(questionId, questionAnswer);
 
-      if (typeof validations === 'undefined' || validations.length === 0) {
-        return;
-      }
-
-      /*
-       * Run the question through its validations and
-       * show any error messages if invalid.
-       */
-      var questionValidationErrors = [];
-      validations.forEach(function (validation) {
-        if (Validation.validateAnswer(questionAnswer, validation)) {
-          return;
-        }
-
-        questionValidationErrors.push({
-          type: validation.type,
-          message: ErrorMessages.getErrorMessage(validation)
-        });
-      });
-
-      var validationErrors = _.chain(this.state.validationErrors).set(questionId, questionValidationErrors).value();
-
       this.setState({
-        validationErrors: validationErrors
+        validationErrors: _.chain(this.state.validationErrors).set(questionId, []).value()
       });
+
+      if (validateOn === 'change') {
+        this.handleAnswerValidate(questionId, questionAnswer, validations);
+      }
+    }
+  }, {
+    key: 'handleQuestionBlur',
+    value: function handleQuestionBlur(questionId, questionAnswer, validations, validateOn) {
+      if (validateOn === 'blur') {
+        this.handleAnswerValidate(questionId, questionAnswer, validations);
+      }
+    }
+  }, {
+    key: 'handleInputKeyDown',
+    value: function handleInputKeyDown(e) {
+      if (KeyCodez[e.keyCode] === 'enter') {
+        e.preventDefault();
+        this.handleMainButtonClick.call(this);
+      }
     }
   }, {
     key: 'render',
@@ -164,7 +191,9 @@ var QuestionPanel = (function (_React$Component) {
           questionAnswers: _this2.props.questionAnswers,
           renderError: _this2.props.renderError,
           validationErrors: _this2.state.validationErrors,
-          onAnswerChange: _this2.handleAnswerChange.bind(_this2) });
+          onAnswerChange: _this2.handleAnswerChange.bind(_this2),
+          onQuestionBlur: _this2.handleQuestionBlur.bind(_this2),
+          onKeyDown: _this2.handleInputKeyDown.bind(_this2) });
       });
 
       return React.createElement(
@@ -175,12 +204,12 @@ var QuestionPanel = (function (_React$Component) {
           { className: this.props.classes.questionPanelHeaderContainer },
           typeof this.props.panelHeader ? React.createElement(
             'h3',
-            { className: this.props.questionPanelHeaderText },
+            { className: this.props.classes.questionPanelHeaderText },
             this.props.panelHeader
           ) : undefined,
           typeof this.props.panelText ? React.createElement(
             'p',
-            { className: this.props.questionPanelText },
+            { className: this.props.classes.questionPanelText },
             this.props.panelText
           ) : undefined
         ) : undefined,
