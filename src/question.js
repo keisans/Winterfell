@@ -107,7 +107,8 @@ class Question extends React.Component {
             )
           : undefined}
         {validationErrors}
-        <Input name={this.props.questionId}
+        <Input {...this.props.input.props}
+               name={this.props.questionId}
                value={value}
                text={this.props.input.text}
                options={this.props.input.options}
